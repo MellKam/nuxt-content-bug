@@ -7,10 +7,8 @@ const route = useRoute();
 const collection = computed(() => route.params.collection as keyof Collections);
 
 const { data: nav } = await useAsyncData(
-	`${collection.value}:navigation`,
-	() => {
-		return queryCollectionNavigation(collection.value);
-	},
+	"navigation",
+	() => queryCollectionNavigation(collection.value),
 	{ watch: [collection] }
 );
 </script>
