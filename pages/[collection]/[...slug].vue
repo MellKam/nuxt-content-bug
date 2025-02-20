@@ -6,17 +6,30 @@ definePageMeta({
 });
 
 const route = useRoute();
+const collection = computed(() => route.params.collection as keyof Collections);
 
-const { data: page } = await useAsyncData(() => {
-	const path =
+const pagePath = computed(() => {
+	return (
 		"/" +
 		(Array.isArray(route.params.slug)
 			? (route.params.slug as string[]).filter((part) => part !== "").join("/")
-			: (route.params.slug as string));
-	return queryCollection(route.params.collection as keyof Collections)
-		.path(path)
-		.first();
+			: (route.params.slug as string))
+	);
 });
+
+const { data: page } = await useAsyncData(
+	`${collection.value}:${pagePath.value}:page`,
+	() => {
+		return queryCollection(collection.value).path(pagePath.value).first();
+	}
+);
+
+const { data: surroundings } = await useAsyncData(
+	`${collection.value}:${pagePath.value}:surroundings`,
+	() => {
+		return queryCollectionItemSurroundings(collection.value, pagePath.value);
+	}
+);
 
 useSeoMeta({
 	title: page.value?.title,
@@ -25,6 +38,9 @@ useSeoMeta({
 </script>
 
 <template>
-	<ContentRenderer v-if="page" :value="page" />
+	<main v-if="page">
+		<ContentRenderer :value="page" />
+		{{ surroundings }}
+	</main>
 	<div v-else>Page not found</div>
 </template>

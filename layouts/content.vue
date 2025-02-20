@@ -4,12 +4,13 @@ import DefaultLayout from "./default.vue";
 
 const route = useRoute();
 
-const collection = computed(
-	() => route.path.split("/")[1]! as keyof Collections
-);
+const collection = computed(() => route.params.collection as keyof Collections);
 
 const { data: nav } = await useAsyncData(
-	() => queryCollectionNavigation(collection.value),
+	`${collection.value}:navigation`,
+	() => {
+		return queryCollectionNavigation(collection.value);
+	},
 	{ watch: [collection] }
 );
 </script>
