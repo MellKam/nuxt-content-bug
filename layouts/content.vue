@@ -10,7 +10,7 @@ const collection = computed(
 
 const { data: nav } = await useAsyncData(
 	() => queryCollectionNavigation(collection.value),
-	{ watch: [() => route.path] }
+	{ watch: [collection] }
 );
 </script>
 
